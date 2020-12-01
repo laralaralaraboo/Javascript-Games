@@ -15,7 +15,7 @@
 
 </head>
 <body>
-    <canvas id="canvas" height="300" style="border:3.5px dotted #ffa45b;border-bottom: 3.5px dotted rgba(165, 42, 42, 0.356)">Canvas is not supported.</canvas>
+    <canvas id="canvas" height="300" style="border:3.5px dotted #ffa45b;border-bottom: 3.5px dotted rgba(165, 42, 42, 0.356) center">Canvas is not supported.</canvas>
     <button onclick="startGame()">Start</button>
     <script>
         const canvas = document.getElementById('canvas')
@@ -30,6 +30,7 @@
         let x, y, dy, dx, interval, radius, paddleW, paddleX, paddleY, brickW, brickH, brickOffset
         let bricks = []
         let score = 0
+        let lives = 10
 
         setVariables()
         drawBall()
@@ -46,7 +47,13 @@
             ctx.beginPath()
             ctx.fillStyle = "#f6f5f1"
             ctx.fill()
-            ctx.fillText("Score: " + score, 7 ,10)
+            ctx.fillText("Score: " + score, 10 ,10)
+            ctx.closePath()
+
+            ctx.beginPath()
+            ctx.fillStyle = "#f6f5f1"
+            ctx.fill()
+            ctx.fillText("Lives: " + lives, 245 ,10)
             ctx.closePath()
 
         }
@@ -106,6 +113,9 @@
 
         
         function detectCollision() {
+            if(lives === 0){
+                gameover()
+            }
             if(x + dx >= canvasW || x +dx < 0 ){
                 dx = -dx
             }
@@ -160,7 +170,7 @@
                     detectCollision()
                     x = x + dx
                     y = y + dy
-                    checkGameover()
+                    checkDeath()
                     ctx.clearRect(0,0,canvas.width, canvas.height)
                     drawBall()
                     drawPaddle()
@@ -171,12 +181,13 @@
         }
         
 
-        function checkGameover(){
+        function checkDeath(){
             if (y === (canvasH - (radius-5))){
                 alert('Sorry Bub! Try Again.')
                 clearInterval(interval)
                 setVariables()
                 interval = null
+                lives = lives - 1
             }
         }
         function checkWin(){
@@ -184,8 +195,33 @@
                 alert("You're the best at what you do. And, what you do ain't pretty.")
                 clearInterval(interval)
                 setVariables()
+                
+                score = score+10
+                
                 interval = null
+                createBrickArray()
+                startGame()
             }
+        }
+
+        function gameover(){
+            alert("You did your best?")
+            interval = null
+
+        //lives wont go back to 10 wtf
+        setVariables()
+        drawBall()
+        drawPaddle()
+        
+        paddleNavigation()
+        createBrickArray()
+        drawBricks()
+      
+
+        drawScore()
+        let score = 0
+        let lives = 10
+        startGame()
         }
 
         function setVariables(){

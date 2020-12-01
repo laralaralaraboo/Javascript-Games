@@ -1,8 +1,556 @@
-<html>
-<head></head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--thank you Drew Conely for open source code! -->
+    <meta charset="UTF-8" />
+    <title>Lara Nazario - Front End Developer</title>
+    <style>
+:root {
+   --pixel-size: 2px;
+   --grid-cell: calc( var(--pixel-size) * 16);
+   --bg: #9fa7e4;
+}
+@media( min-width: 700px ) {
+   :root {
+      --pixel-size: 3px;
+   }
+}
+@media( min-width: 1000px ) {
+   :root {
+      --pixel-size: 4px;
+   }
+}
+/* @media( min-width: 1000px ) {
+   :root {
+      --pixel-size: 5px;
+   }
+} */
 
+html, body {
+   height: 100%;
+}
+
+body {
+   background: var(--bg);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
+
+.pixel-art {
+   image-rendering: pixelated;
+}
+
+.frame {
+   /* This is just for Pen decoration */
+   width: calc(var(--pixel-size) * 160);
+   height: calc(var(--pixel-size) * 144);
+   outline: var(--pixel-size) solid #fff;
+   z-index:1; 
+   position:relative;
+}
+
+.camera {
+   width: calc(var(--pixel-size) * 160);
+   height: calc(var(--pixel-size) * 144);
+   overflow: hidden;
+   background: #0a0016;
+   position:relative;
+}
+
+.map {
+   image-rendering: pixelated;
+   background: url("/images/CameraDemoMap.png") no-repeat;
+   background-size: 100%;
+   width: calc(39 * var(--grid-cell));
+   height: calc(30 * var(--grid-cell));
+   position: relative;
+}
+
+.character {
+   width: calc( var(--grid-cell)* 2 );
+   height: calc( var(--grid-cell)* 2 );
+   position: absolute;
+   overflow:hidden;
+}
+
+.shadow {
+   width: calc( var(--grid-cell)* 2 );
+   height: calc( var(--grid-cell)* 2 );
+   position: absolute;
+   left:0;
+   top:0;
+   background: url("/images/DemoRpgCharacterShadow.png") no-repeat no-repeat;
+   background-size: 100%;
+}
+
+.character_spritesheet {
+   opacity: 1;
+   position: absolute;
+   background: url("/images/DemoRpgCharacter.png") no-repeat no-repeat;
+   background-size: 100%;
+   width: calc( var(--grid-cell)* 8 );
+   height: calc( var(--grid-cell)* 8 );
+}
+
+.character_spritesheet.fade {
+   opacity: 0;
+}
+
+.character[facing="right"] .character_spritesheet {
+   background-position-y: calc( var(--pixel-size) * -32 );
+}
+.character[facing="up"] .character_spritesheet {
+   background-position-y: calc( var(--pixel-size) * -64 );
+}
+.character[facing="left"] .character_spritesheet {
+   background-position-y: calc( var(--pixel-size) * -96 );
+}
+.character[walking="true"] .character_spritesheet {
+   animation: walkAnimation 0.6s steps(4) infinite; 
+}
+
+@keyframes walkAnimation {
+  from {
+    transform: translate3d(0%,0%,0);
+  }
+  to {
+    transform: translate3d(-100%,0%,0);
+  }
+}
+
+.dpad {
+   position:absolute;
+   right: calc(var(--pixel-size) * 2);
+   bottom: calc(var(--pixel-size) * 2);
+   width: calc(var(--pixel-size) * 37);
+   height: calc(var(--pixel-size) * 38);
+}
+.dpad-button {
+   appearance:none;
+   outline:0;
+   border:0;
+   background:transparent;
+   padding:0;
+   cursor:pointer;
+}
+.dpad-button svg {
+   display:block;
+   height: calc(var(--pixel-size) * 13);
+}
+
+.dpad-button.pressed .Arrow_arrow-inset { stroke:#28024d; }
+.dpad-button.pressed .Arrow_arrow-body { stroke:#28024d; }
+
+.dpad-up {
+   position: absolute;
+   left: calc(var(--pixel-size) * 12);
+   top:0;
+}
+.dpad-down {
+   position: absolute;
+   bottom:var(--pixel-size);
+   left: calc(var(--pixel-size) * 12);
+}
+.dpad-left {
+   position: absolute;
+   top: calc(var(--pixel-size) * 12);
+   left:0;
+}
+.dpad-right {
+   position: absolute;
+   top: calc(var(--pixel-size) * 12);
+   right:0;
+}
+
+.dpad {
+   user-select:none;
+}
+
+
+.corner_topleft,
+.corner_topright,
+.corner_bottomleft,
+.corner_bottomright {
+   position: absolute;
+   width: var(--pixel-size);
+   height: var(--pixel-size);
+   background: var(--bg);
+   z-index:2;
+}
+
+.corner_topleft {
+   top: calc(var(--pixel-size) * -1);
+   left: calc(var(--pixel-size) * -1);
+}
+.corner_topright {
+   top: calc(var(--pixel-size) * -1);
+   right: calc(var(--pixel-size) * -1);
+}
+.corner_bottomleft {
+   bottom: calc(var(--pixel-size) * -1);
+   left: calc(var(--pixel-size) * -1);
+}
+.corner_bottomright {
+   bottom: calc(var(--pixel-size) * -1);
+   right: calc(var(--pixel-size) * -1);
+}
+
+.headline {
+   position:absolute;
+   top:calc(var(--pixel-size) * 2);
+   right:calc(var(--pixel-size) * 2);
+   width: calc(var(--pixel-size) * 75)
+}
+
+    
+    </style>
+</head>
+
+
+
+
+
+
+
+
+<div class="frame">
+    <div class="corner_topleft"></div>
+    <div class="corner_topright"></div>
+    <div class="corner_bottomleft"></div>
+    <div class="corner_bottomright"></div>
+    
+    
+    <div class="camera">
+       <div class="map pixel-art">
+          <div class="character" facing="down" walking="true">
+             <div class="shadow pixel-art"></div>
+             <div class="character_spritesheet pixel-art"></div>
+          </div>
+       </div>
+ 
+ 
+       <div class="dpad">
+          <div class="DemoDirectionUI flex-center">
+                <button class="dpad-button dpad-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 13 13" shape-rendering="crispEdges">
+                        <path class="Arrow_outline-top"  stroke="#5f5f5f" d="M1 0h11M0 1h1M12 1h1M0 2h1M12 2h1M0 3h1M12 3h1M0 4h1M12 4h1M0 5h1M12 5h1M0 6h1M12 6h1M0 7h1M12 7h1M0 8h1M12 8h1" />
+                        <path class="Arrow_surface" stroke="#f5f5f5" d="M1 1h11M1 2h11M1 3h5M7 3h5M1 4h4M7 4h5M1 5h3M7 5h5M1 6h4M7 6h5M1 7h5M7 7h5M1 8h11" />
+                        <path class="Arrow_arrow-inset"  stroke="#434343" d="M6 3h1M5 4h1M4 5h1" />
+                        <path class="Arrow_arrow-body" stroke="#5f5f5f" d="M6 4h1M5 5h2M5 6h2M6 7h1" />
+                        <path class="Arrow_outline-bottom" stroke="#434343" d="M0 9h1M12 9h1M0 10h1M12 10h1M0 11h1M12 11h1M1 12h11" />
+                        <path class="Arrow_edge" stroke="#ffffff" d="M1 9h11" />
+                        <path class="Arrow_front" stroke="#cccccc" d="M1 10h11M1 11h11" />
+                    </svg>
+                </button>
+                <button class="dpad-button dpad-up">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 13 13" shape-rendering="crispEdges">
+                        <path class="Arrow_outline-top"  stroke="#5f5f5f" d="M1 0h11M0 1h1M12 1h1M0 2h1M12 2h1M0 3h1M12 3h1M0 4h1M12 4h1M0 5h1M12 5h1M0 6h1M12 6h1M0 7h1M12 7h1M0 8h1M12 8h1" />
+                        <path class="Arrow_surface" stroke="#f5f5f5" d="M1 1h11M1 2h11M1 3h11M1 4h5M7 4h5M1 5h4M8 5h4M1 6h3M9 6h3M1 7h11M1 8h11" />
+                        <path class="Arrow_arrow-inset"  stroke="#434343" d="M6 4h1M5 5h1M7 5h1" />
+                        <path class="Arrow_arrow-body" stroke="#5f5f5f" d="M6 5h1M4 6h5" />
+                        <path class="Arrow_outline-bottom" stroke="#434343" d="M0 9h1M12 9h1M0 10h1M12 10h1M0 11h1M12 11h1M1 12h11" />
+                        <path class="Arrow_edge" stroke="#ffffff" d="M1 9h11" />
+                        <path class="Arrow_front" stroke="#cccccc" d="M1 10h11M1 11h11" />
+                    </svg>
+                </button>
+                <button class="dpad-button dpad-down">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 13 13" shape-rendering="crispEdges">
+                        <path class="Arrow_outline-top" stroke="#5f5f5f" d="M1 0h11M0 1h1M12 1h1M0 2h1M12 2h1M0 3h1M12 3h1M0 4h1M12 4h1M0 5h1M12 5h1M0 6h1M12 6h1M0 7h1M12 7h1M0 8h1M12 8h1" />
+                        <path class="Arrow_surface" stroke="#f5f5f5" d="M1 1h11M1 2h11M1 3h11M1 4h3M9 4h3M1 5h4M8 5h4M1 6h5M7 6h5M1 7h11M1 8h11" />
+                        <path class="Arrow_arrow-inset" stroke="#434343" d="M4 4h5" />
+                        <path class="Arrow_arrow-body" stroke="#5f5f5f" d="M5 5h3M6 6h1" />
+                        <path class="Arrow_outline-bottom" stroke="#434343" d="M0 9h1M12 9h1M0 10h1M12 10h1M0 11h1M12 11h1M1 12h11" />
+                        <path class="Arrow_edge" stroke="#ffffff" d="M1 9h11" />
+                        <path class="Arrow_front" stroke="#cccccc" d="M1 10h11M1 11h11" />
+                    </svg>
+                </button>
+                <button class="dpad-button dpad-right">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 13 13" shape-rendering="crispEdges">
+                        <path class="Arrow_outline-top"  stroke="#5f5f5f" d="M1 0h11M0 1h1M12 1h1M0 2h1M12 2h1M0 3h1M12 3h1M0 4h1M12 4h1M0 5h1M12 5h1M0 6h1M12 6h1M0 7h1M12 7h1M0 8h1M12 8h1" />
+                        <path class="Arrow_surface" stroke="#f5f5f5" d="M1 1h11M1 2h11M1 3h5M7 3h5M1 4h5M8 4h4M1 5h5M9 5h3M1 6h5M8 6h4M1 7h5M7 7h5M1 8h11" />
+                        <path class="Arrow_arrow-inset"  stroke="#434343" d="M6 3h1M7 4h1M8 5h1" />
+                        <path class="Arrow_arrow-body" stroke="#5f5f5f" d="M6 4h1M6 5h2M6 6h2M6 7h1" />
+                        <path class="Arrow_outline-bottom" stroke="#434343" d="M0 9h1M12 9h1M0 10h1M12 10h1M0 11h1M12 11h1M1 12h11" />
+                        <path class="Arrow_edge" stroke="#ffffff" d="M1 9h11" />
+                        <path class="Arrow_front" stroke="#cccccc" d="M1 10h11M1 11h11" />
+                    </svg>
+                </button>
+            </div>
+       </div>
+       
+       
+       <svg class="headline" xmlns="http://www.w3.org/2000/svg" viewBox="0 -0.5 150 60" shape-rendering="crispEdges">
+ <metadata>Made with Pixels to Svg https://codepen.io/shshaw/pen/XbxvNj</metadata>
+ <path stroke="rgba(255,255,255,0.1568627450980392)" d="M0 0h1" />
+ <path stroke="rgba(255,255,255,0.5333333333333333)" d="M1 0h1" />
+ <path stroke="rgba(255,255,255,0.5058823529411764)" d="M2 0h141" />
+ <path stroke="rgba(255,255,255,0.5098039215686274)" d="M143 0h1" />
+ <path stroke="rgba(253,254,254,0.5137254901960784)" d="M144 0h1" />
+ <path stroke="rgba(167,167,167,0.11372549019607843)" d="M145 0h1" />
+ <path stroke="rgba(219,221,221,0.6)" d="M0 1h1" />
+ <path stroke="#959490" d="M1 1h1" />
+ <path stroke="#95938d" d="M2 1h1" />
+ <path stroke="#96948e" d="M3 1h140" />
+ <path stroke="#94928c" d="M143 1h1" />
+ <path stroke="#a2a09b" d="M144 1h1" />
+ <path stroke="rgba(179,183,183,0.5450980392156862)" d="M145 1h1" />
+ <path stroke="rgba(165,164,162,0.8823529411764706)" d="M0 2h1" />
+ <path stroke="#0c2045" d="M1 2h1" />
+ <path stroke="#16306e" d="M2 2h1" />
+ <path stroke="#173068" d="M3 2h1M10 2h2M69 2h1" />
+ <path stroke="#153264" d="M4 2h5M71 2h72" />
+ <path stroke="#163166" d="M9 2h1M70 2h1" />
+ <path stroke="#172f69" d="M12 2h57" />
+ <path stroke="#143264" d="M143 2h1" />
+ <path stroke="#142f5e" d="M144 2h1" />
+ <path stroke="rgba(167,171,176,0.8313725490196079)" d="M145 2h1" />
+ <path stroke="rgba(159,164,162,0.9019607843137255)" d="M0 3h1" />
+ <path stroke="#1f2e9d" d="M1 3h1" />
+ <path stroke="#3233cc" d="M2 3h1" />
+ <path stroke="#3033c6" d="M3 3h140" />
+ <path stroke="#3032c7" d="M143 3h1" />
+ <path stroke="#242dbc" d="M144 3h1" />
+ <path stroke="rgba(162,175,198,0.8509803921568627)" d="M145 3h1" />
+ <path stroke="rgba(161,165,164,0.8941176470588236)" d="M0 4h1M0 53h1" />
+ <path stroke="#1f2c9b" d="M1 4h1M1 6h1M1 12h1M1 13h1" />
+ <path stroke="#3230c6" d="M2 4h1" />
+ <path stroke="#3030c1" d="M3 4h1M4 5h1" />
+ <path stroke="#3030c0" d="M4 4h139M5 5h138M4 6h139M3 7h140M3 8h140M3 9h6M10 9h7M18 9h125M3 10h5M11 10h5M19 10h124M3 11h5M11 11h5M19 11h2M26 11h5M32 11h3M36 11h13M50 11h3M54 11h5M60 11h3M64 11h11M78 11h9M88 11h9M98 11h9M114 11h29M3 12h5M11 12h5M19 12h1M27 12h3M33 12h1M37 12h11M51 12h1M55 12h3M61 12h1M65 12h9M79 12h7M89 12h7M99 12h7M115 12h28M3 13h5M11 13h5M19 13h1M28 13h2M33 13h1M37 13h11M51 13h1M56 13h2M61 13h1M65 13h8M80 13h6M89 13h7M99 13h7M115 13h28M3 14h5M11 14h5M19 14h2M29 14h1M33 14h1M37 14h12M50 14h2M57 14h1M61 14h1M65 14h7M81 14h5M89 14h7M99 14h7M115 14h28M3 15h5M11 15h2M14 15h2M19 15h2M29 15h1M33 15h1M37 15h4M42 15h7M50 15h2M61 15h1M70 15h2M75 15h3M81 15h5M94 15h2M104 15h2M115 15h28M3 16h5M11 16h1M15 16h1M19 16h1M29 16h1M33 16h1M37 16h3M43 16h5M51 16h1M61 16h1M71 16h1M75 16h3M81 16h5M95 16h1M105 16h1M115 16h28M3 17h5M11 17h1M15 17h1M19 17h1M29 17h1M33 17h1M43 17h5M51 17h1M55 17h1M61 17h1M71 17h1M75 17h3M81 17h5M95 17h1M105 17h1M115 17h28M3 18h5M11 18h1M15 18h1M19 18h1M29 18h1M33 18h1M42 18h6M51 18h1M55 18h2M61 18h1M70 18h2M75 18h3M81 18h5M94 18h2M105 18h1M114 18h29M3 19h5M19 19h1M29 19h1M33 19h1M42 19h6M51 19h1M55 19h3M61 19h1M70 19h2M81 19h5M94 19h2M99 19h3M105 19h1M114 19h29M3 20h6M18 20h2M29 20h1M33 20h1M43 20h5M51 20h1M55 20h3M61 20h1M71 20h2M80 20h6M95 20h1M99 20h3M105 20h1M115 20h28M3 21h7M13 21h1M17 21h3M29 21h1M33 21h1M37 21h3M43 21h5M51 21h1M55 21h3M61 21h1M71 21h3M79 21h7M95 21h1M99 21h3M105 21h1M115 21h28M3 22h8M12 22h3M16 22h5M28 22h3M32 22h3M36 22h5M42 22h7M50 22h3M54 22h5M60 22h3M70 22h5M78 22h9M94 22h3M98 22h5M104 22h3M114 22h29M3 23h6M16 23h3M26 23h3M30 23h7M38 23h3M48 23h3M58 23h7M66 23h11M80 23h5M86 23h3M96 23h3M106 23h7M114 23h11M128 23h15M3 24h5M17 24h1M27 24h1M31 24h5M39 24h1M49 24h1M59 24h5M67 24h9M81 24h3M87 24h1M97 24h1M107 24h5M115 24h9M129 24h14M3 25h5M17 25h1M27 25h1M31 25h5M39 25h1M49 25h1M59 25h5M67 25h8M82 25h2M87 25h1M97 25h1M107 25h5M115 25h8M130 25h13M3 26h5M16 26h2M27 26h1M31 26h5M39 26h1M49 26h1M58 26h6M67 26h7M83 26h1M87 26h1M97 26h1M106 26h6M115 26h7M131 26h12M3 27h5M16 27h2M27 27h1M31 27h2M34 27h2M39 27h1M49 27h1M53 27h11M72 27h2M77 27h3M83 27h1M87 27h1M97 27h1M106 27h6M120 27h2M125 27h3M131 27h12M3 28h5M17 28h1M27 28h1M31 28h1M35 28h1M39 28h1M49 28h1M53 28h11M73 28h1M77 28h3M83 28h1M87 28h1M97 28h1M107 28h5M121 28h1M125 28h3M131 28h12M3 29h5M17 29h1M27 29h1M31 29h1M35 29h1M39 29h1M49 29h1M53 29h11M73 29h1M77 29h3M83 29h1M87 29h1M97 29h1M107 29h5M121 29h1M125 29h3M131 29h12M3 30h6M17 30h1M26 30h2M31 30h1M35 30h1M39 30h1M48 30h2M53 30h11M73 30h1M77 30h3M83 30h1M87 30h1M96 30h3M107 30h5M120 30h2M125 30h3M131 30h12M3 31h6M17 31h1M26 31h2M39 31h1M48 31h2M53 31h11M67 31h3M73 31h1M83 31h1M87 31h1M96 31h3M107 31h5M120 31h2M131 31h12M3 32h5M17 32h1M27 32h2M38 32h2M49 32h1M53 32h11M67 32h3M73 32h2M82 32h2M87 32h1M97 32h1M107 32h5M121 32h2M130 32h13M3 33h5M17 33h1M27 33h3M33 33h1M37 33h3M49 33h1M53 33h11M67 33h3M73 33h3M81 33h3M87 33h1M97 33h1M107 33h5M121 33h3M129 33h14M3 34h6M16 34h3M26 34h5M32 34h3M36 34h5M48 34h3M52 34h13M66 34h5M72 34h5M80 34h5M86 34h3M96 34h3M106 34h7M120 34h5M128 34h15M3 35h6M16 35h3M20 35h3M28 35h5M34 35h5M40 35h7M48 35h9M58 35h9M74 35h7M88 35h3M96 35h5M102 35h7M110 35h3M120 35h3M130 35h13M3 36h5M17 36h1M21 36h1M29 36h3M35 36h3M41 36h5M49 36h7M59 36h7M75 36h5M89 36h1M97 36h3M103 36h5M111 36h1M121 36h1M131 36h12M3 37h5M17 37h1M21 37h1M30 37h2M35 37h3M41 37h5M49 37h7M59 37h7M75 37h5M89 37h1M98 37h2M104 37h3M111 37h1M121 37h1M131 37h12M3 38h5M17 38h1M21 38h2M31 38h1M35 38h3M41 38h5M49 38h7M59 38h7M75 38h5M88 38h3M99 38h1M105 38h1M111 38h1M121 38h1M130 38h13M3 39h5M17 39h1M21 39h2M31 39h1M41 39h5M54 39h2M64 39h2M75 39h5M83 39h2M88 39h3M99 39h1M111 39h1M121 39h1M130 39h13M3 40h5M17 40h1M21 40h1M31 40h1M41 40h5M55 40h1M65 40h1M75 40h5M83 40h1M89 40h1M99 40h1M111 40h1M121 40h1M131 40h12M3 41h5M17 41h1M21 41h1M31 41h1M41 41h5M55 41h1M65 41h1M75 41h5M83 41h1M89 41h1M99 41h1M103 41h1M107 41h1M111 41h1M121 41h1M131 41h12M3 42h5M16 42h2M21 42h1M31 42h2M41 42h5M54 42h2M65 42h1M74 42h6M83 42h2M89 42h1M99 42h1M103 42h1M107 42h1M111 42h1M120 42h3M131 42h12M3 43h5M11 43h7M21 43h1M31 43h2M41 43h5M54 43h2M59 43h3M65 43h1M74 43h6M89 43h1M99 43h1M103 43h1M107 43h1M111 43h1M120 43h3M131 43h2M134 43h9M3 44h5M11 44h7M21 44h1M31 44h1M41 44h5M55 44h1M59 44h3M65 44h1M75 44h5M89 44h1M99 44h1M103 44h1M107 44h1M111 44h1M121 44h1M131 44h1M135 44h8M3 45h5M11 45h7M21 45h1M31 45h1M41 45h5M55 45h1M59 45h3M65 45h1M75 45h5M89 45h1M99 45h1M103 45h1M107 45h1M111 45h1M121 45h1M131 45h1M135 45h8M3 46h6M10 46h9M20 46h3M30 46h3M40 46h7M54 46h3M58 46h5M64 46h3M74 46h7M88 46h3M98 46h3M102 46h3M106 46h3M110 46h3M120 46h3M130 46h3M134 46h9M3 47h140M3 48h140M3 49h140M3 50h140M3 51h140M3 52h140M4 53h139" />
+ <path stroke="#302fc1" d="M143 4h1M143 5h1M143 6h1M143 7h1M143 8h1M143 9h1M143 10h1M143 11h1M143 12h1M143 13h1M143 14h1M143 15h1M143 16h1M143 17h1M143 18h1M143 19h1M143 20h1M143 21h1M143 22h1M143 23h1M143 24h1M143 25h1M143 26h1M143 27h1M143 28h1M143 29h1M143 30h1M143 31h1M143 32h1M143 33h1M143 34h1M143 35h1M143 36h1M143 37h1M143 38h1M143 39h1M143 40h1M143 41h1M143 42h1M143 43h1M143 44h1M143 45h1M143 46h1M143 47h1M143 48h1M143 49h1M143 50h1M143 51h1M143 52h1M143 53h1" />
+ <path stroke="#262cb8" d="M144 4h1M144 5h1M144 6h1M144 7h1M144 8h1M144 9h1M144 10h1M144 11h1M144 12h1M144 13h1M144 14h1M144 15h1M144 16h1M144 17h1M144 18h1M144 19h1M144 20h1M144 21h1M144 22h1M144 23h1M144 24h1M144 25h1M144 26h1M144 27h1M144 28h1M144 29h1M144 30h1M144 31h1M144 32h1M144 33h1M144 34h1M144 35h1M144 36h1M144 37h1M144 38h1M144 39h1M144 40h1M144 41h1M144 42h1M144 43h1M144 44h1M144 45h1M144 46h1M144 47h1M144 48h1M144 49h1M144 50h1M144 51h1M144 52h1M144 53h1" />
+ <path stroke="rgba(162,175,199,0.8431372549019608)" d="M145 4h1M145 5h1M145 6h1M145 7h1M145 8h1M145 9h1M145 10h1M145 11h1M145 12h1M145 13h1M145 14h1M145 15h1M145 16h1M145 17h1M145 18h1M145 19h1M145 20h1M145 21h1M145 22h1M145 23h1M145 24h1M145 25h1M145 26h1M145 27h1M145 28h1M145 29h1M145 30h1M145 31h1M145 32h1M145 33h1M145 34h1M145 35h1M145 36h1M145 37h1M145 38h1M145 39h1M145 40h1M145 41h1M145 42h1M145 43h1M145 44h1M145 45h1M145 46h1M145 47h1M145 48h1M145 49h1M145 50h1M145 51h1M145 52h1M145 53h1" />
+ <path stroke="rgba(161,165,165,0.8941176470588236)" d="M0 5h1M0 6h1M0 7h1M0 8h1M0 9h1M0 10h1M0 11h1M0 12h1M0 13h1M0 14h1M0 15h1M0 16h1M0 17h1M0 18h1M0 19h1M0 20h1M0 21h1M0 22h1M0 23h1M0 24h1M0 25h1M0 26h1M0 27h1M0 28h1M0 29h1M0 30h1M0 31h1M0 32h1M0 33h1M0 34h1M0 35h1M0 36h1M0 37h1M0 38h1M0 39h1M0 40h1M0 41h1M0 42h1M0 43h1M0 44h1M0 45h1M0 46h1M0 47h1M0 48h1M0 49h1M0 51h1M0 52h1" />
+ <path stroke="#1f2c9c" d="M1 5h1" />
+ <path stroke="#312fbe" d="M2 5h1" />
+ <path stroke="#2f2fb9" d="M3 5h1" />
+ <path stroke="#312fc3" d="M2 6h1M2 53h1" />
+ <path stroke="#3030be" d="M3 6h1" />
+ <path stroke="#1f2c9a" d="M1 7h1" />
+ <path stroke="#312fc5" d="M2 7h1M2 8h1M2 9h1M2 10h1M2 11h1M2 12h1M2 13h1M2 14h1M2 15h1M2 16h1M2 17h1M2 18h1M2 19h1M2 20h1M2 21h1M2 22h1M2 23h1M2 24h1M2 25h1M2 26h1M2 27h1M2 28h1M2 29h1M2 30h1M2 31h1M2 32h1M2 33h1M2 34h1M2 35h1M2 36h1M2 37h1M2 38h1M2 39h1M2 40h1M2 41h1M2 42h1M2 43h1M2 44h1M2 45h1M2 46h1M2 47h1M2 48h1M2 49h1M2 50h1M2 51h1M2 52h1" />
+ <path stroke="#1f2b9b" d="M1 8h1M1 10h1M1 14h1M1 15h1M1 16h1M1 18h1M1 20h1M1 24h1M1 25h1M1 26h1M1 27h1M1 28h1M1 29h1M1 32h1M1 34h1M1 37h1M1 38h1M1 39h1M1 40h1M1 42h1M1 44h1M1 45h1M1 48h1" />
+ <path stroke="#1f2b9a" d="M1 9h1M1 11h1M1 17h1M1 19h1M1 21h1M1 22h1M1 23h1M1 30h1M1 31h1M1 33h1M1 35h1M1 36h1M1 41h1M1 43h1M1 46h1M1 47h1M1 52h1M1 53h1" />
+ <path stroke="#4040c1" d="M9 9h1M17 9h1M21 11h5M31 11h1M35 11h1M49 11h1M53 11h1M59 11h1M63 11h1M75 11h3M87 11h1M97 11h1M107 11h7M27 13h1M55 13h1M73 13h1M79 13h1M21 14h5M49 14h1M75 14h3M109 14h3M13 15h1M21 15h5M41 15h1M49 15h1M57 15h1M65 15h5M89 15h5M99 15h5M109 15h3M55 16h1M37 17h3M23 18h3M41 18h1M57 18h1M65 18h5M89 18h5M99 18h3M109 18h5M11 19h1M15 19h1M23 19h3M41 19h1M65 19h5M75 19h3M89 19h5M109 19h5M9 20h1M13 20h1M17 20h1M37 20h3M73 20h1M79 20h1M11 22h1M15 22h1M21 22h7M31 22h1M35 22h1M41 22h1M49 22h1M53 22h1M59 22h1M63 22h7M75 22h3M87 22h7M97 22h1M103 22h1M107 22h7M9 23h7M19 23h7M29 23h1M37 23h1M41 23h7M51 23h7M65 23h1M77 23h3M85 23h1M89 23h7M99 23h7M113 23h1M125 23h3M75 25h1M81 25h1M123 25h1M129 25h1M11 26h5M21 26h3M43 26h3M53 26h5M77 26h3M91 26h3M101 26h5M125 26h3M11 27h5M21 27h3M33 27h1M43 27h3M67 27h5M91 27h3M101 27h5M115 27h5M9 30h5M21 30h5M43 30h5M67 30h3M91 30h5M99 30h5M115 30h5M9 31h5M21 31h5M31 31h1M35 31h1M43 31h5M77 31h3M91 31h5M99 31h5M115 31h5M125 31h3M29 32h1M33 32h1M37 32h1M75 32h1M81 32h1M123 32h1M129 32h1M9 34h7M19 34h7M31 34h1M35 34h1M41 34h7M51 34h1M65 34h1M71 34h1M77 34h3M85 34h1M89 34h7M99 34h7M113 34h7M125 34h3M9 35h7M19 35h1M23 35h5M33 35h1M39 35h1M47 35h1M57 35h1M67 35h7M81 35h7M91 35h5M101 35h1M109 35h1M113 35h7M123 35h7M29 37h1M97 37h1M103 37h1M107 37h1M11 38h3M23 38h5M69 38h3M83 38h5M91 38h5M115 38h3M125 38h5M11 39h3M23 39h5M35 39h3M49 39h5M59 39h5M69 39h3M85 39h3M91 39h5M105 39h1M115 39h3M125 39h5M103 40h1M107 40h1M11 42h5M25 42h3M33 42h5M49 42h5M59 42h3M69 42h5M85 42h1M93 42h3M115 42h5M123 42h5M25 43h3M33 43h5M49 43h5M69 43h5M83 43h3M93 43h3M115 43h5M123 43h5M133 43h1M9 46h1M19 46h1M23 46h7M33 46h7M47 46h7M57 46h1M63 46h1M67 46h7M81 46h7M91 46h7M101 46h1M105 46h1M109 46h1M113 46h7M123 46h7M133 46h1" />
+ <path stroke="#b1b1c6" d="M8 10h1M16 10h1M8 11h1M16 11h1M8 12h1M16 12h1M20 12h1M30 12h1M34 12h1M48 12h1M52 12h1M58 12h1M62 12h1M74 12h1M86 12h1M96 12h1M106 12h1M8 13h1M16 13h1M20 13h1M30 13h1M34 13h1M48 13h1M52 13h1M58 13h1M62 13h1M74 13h1M86 13h1M96 13h1M106 13h1M8 14h1M16 14h1M26 14h1M30 14h1M34 14h1M52 14h1M58 14h1M62 14h1M72 14h1M78 14h1M86 14h1M96 14h1M106 14h1M112 14h1M8 15h1M16 15h1M26 15h1M30 15h1M34 15h1M52 15h1M58 15h1M62 15h1M72 15h1M78 15h1M86 15h1M96 15h1M106 15h1M112 15h1M8 16h1M12 16h1M16 16h1M20 16h1M30 16h1M34 16h1M40 16h1M48 16h1M52 16h1M56 16h1M62 16h1M72 16h1M78 16h1M86 16h1M96 16h1M106 16h1M8 17h1M12 17h1M16 17h1M20 17h1M30 17h1M34 17h1M40 17h1M48 17h1M52 17h1M56 17h1M62 17h1M72 17h1M78 17h1M86 17h1M96 17h1M106 17h1M8 18h1M12 18h1M16 18h1M20 18h1M26 18h1M30 18h1M34 18h1M48 18h1M52 18h1M58 18h1M62 18h1M72 18h1M78 18h1M86 18h1M96 18h1M102 18h1M106 18h1M8 19h1M12 19h1M16 19h1M20 19h1M26 19h1M30 19h1M34 19h1M48 19h1M52 19h1M58 19h1M62 19h1M72 19h1M78 19h1M86 19h1M96 19h1M102 19h1M106 19h1M10 20h1M14 20h1M20 20h1M30 20h1M34 20h1M40 20h1M48 20h1M52 20h1M58 20h1M62 20h1M74 20h1M86 20h1M96 20h1M102 20h1M106 20h1M10 21h1M14 21h1M20 21h1M30 21h1M34 21h1M40 21h1M48 21h1M52 21h1M58 21h1M62 21h1M74 21h1M86 21h1M96 21h1M102 21h1M106 21h1M8 24h1M18 24h1M28 24h1M36 24h1M40 24h1M50 24h1M64 24h1M76 24h1M84 24h1M88 24h1M98 24h1M112 24h1M124 24h1M8 25h1M18 25h1M28 25h1M36 25h1M40 25h1M50 25h1M64 25h1M76 25h1M84 25h1M88 25h1M98 25h1M112 25h1M124 25h1M8 26h1M18 26h1M24 26h1M28 26h1M36 26h1M40 26h1M46 26h1M50 26h1M64 26h1M74 26h1M80 26h1M84 26h1M88 26h1M94 26h1M98 26h1M112 26h1M122 26h1M128 26h1M8 27h1M18 27h1M24 27h1M28 27h1M36 27h1M40 27h1M46 27h1M50 27h1M64 27h1M74 27h1M80 27h1M84 27h1M88 27h1M94 27h1M98 27h1M112 27h1M122 27h1M128 27h1M8 28h1M18 28h1M28 28h1M32 28h1M36 28h1M40 28h1M50 28h1M64 28h1M74 28h1M80 28h1M84 28h1M88 28h1M98 28h1M112 28h1M122 28h1M128 28h1M8 29h1M18 29h1M28 29h1M32 29h1M36 29h1M40 29h1M50 29h1M64 29h1M74 29h1M80 29h1M84 29h1M88 29h1M98 29h1M112 29h1M122 29h1M128 29h1M14 30h1M18 30h1M28 30h1M32 30h1M36 30h1M40 30h1M50 30h1M64 30h1M70 30h1M74 30h1M80 30h1M84 30h1M88 30h1M104 30h1M112 30h1M122 30h1M128 30h1M14 31h1M18 31h1M28 31h1M32 31h1M36 31h1M40 31h1M50 31h1M64 31h1M70 31h1M74 31h1M80 31h1M84 31h1M88 31h1M104 31h1M112 31h1M122 31h1M128 31h1M8 32h1M18 32h1M30 32h1M34 32h1M40 32h1M50 32h1M64 32h1M70 32h1M76 32h1M84 32h1M88 32h1M98 32h1M112 32h1M124 32h1M8 33h1M18 33h1M30 33h1M34 33h1M40 33h1M50 33h1M64 33h1M70 33h1M76 33h1M84 33h1M88 33h1M98 33h1M112 33h1M124 33h1M8 36h1M18 36h1M22 36h1M32 36h1M38 36h1M46 36h1M56 36h1M66 36h1M80 36h1M90 36h1M100 36h1M108 36h1M112 36h1M122 36h1M8 37h1M18 37h1M22 37h1M32 37h1M38 37h1M46 37h1M56 37h1M66 37h1M80 37h1M90 37h1M100 37h1M108 37h1M112 37h1M122 37h1M8 38h1M14 38h1M18 38h1M28 38h1M32 38h1M38 38h1M46 38h1M56 38h1M66 38h1M72 38h1M80 38h1M96 38h1M100 38h1M106 38h1M112 38h1M118 38h1M122 38h1M8 39h1M14 39h1M18 39h1M28 39h1M32 39h1M38 39h1M46 39h1M56 39h1M66 39h1M72 39h1M80 39h1M96 39h1M100 39h1M106 39h1M112 39h1M118 39h1M122 39h1M8 40h1M18 40h1M22 40h1M32 40h1M46 40h1M56 40h1M66 40h1M80 40h1M84 40h1M90 40h1M100 40h1M104 40h1M108 40h1M112 40h1M122 40h1M8 41h1M18 41h1M22 41h1M32 41h1M46 41h1M56 41h1M66 41h1M80 41h1M84 41h1M90 41h1M100 41h1M104 41h1M108 41h1M112 41h1M122 41h1M8 42h1M18 42h1M22 42h1M28 42h1M38 42h1M46 42h1M56 42h1M62 42h1M66 42h1M80 42h1M86 42h1M90 42h1M96 42h1M100 42h1M104 42h1M108 42h1M112 42h1M128 42h1M8 43h1M18 43h1M22 43h1M28 43h1M38 43h1M46 43h1M56 43h1M62 43h1M66 43h1M80 43h1M86 43h1M90 43h1M96 43h1M100 43h1M104 43h1M108 43h1M112 43h1M128 43h1M8 44h1M18 44h1M22 44h1M32 44h1M46 44h1M56 44h1M62 44h1M66 44h1M80 44h1M90 44h1M100 44h1M104 44h1M108 44h1M112 44h1M122 44h1M132 44h1M8 45h1M18 45h1M22 45h1M32 45h1M46 45h1M56 45h1M62 45h1M66 45h1M80 45h1M90 45h1M100 45h1M104 45h1M108 45h1M112 45h1M122 45h1M132 45h1" />
+ <path stroke="#c8c8c8" d="M9 10h1M17 10h1M9 11h1M17 11h1M9 12h1M17 12h1M21 12h5M31 12h1M35 12h1M49 12h1M53 12h1M59 12h1M63 12h1M75 12h3M87 12h1M97 12h1M107 12h7M9 13h1M17 13h1M21 13h5M31 13h1M35 13h1M49 13h1M53 13h1M59 13h1M63 13h1M75 13h3M87 13h1M97 13h1M107 13h7M9 14h1M17 14h1M27 14h1M31 14h1M35 14h1M53 14h3M59 14h1M63 14h1M73 14h1M79 14h1M87 14h1M97 14h1M107 14h1M113 14h1M9 15h1M17 15h1M27 15h1M31 15h1M35 15h1M53 15h3M59 15h1M63 15h1M73 15h1M79 15h1M87 15h1M97 15h1M107 15h1M113 15h1M9 16h1M13 16h1M17 16h1M21 16h7M31 16h1M35 16h1M41 16h1M49 16h1M53 16h1M57 16h3M63 16h7M73 16h1M79 16h1M87 16h7M97 16h7M107 16h7M9 17h1M13 17h1M17 17h1M21 17h7M31 17h1M35 17h1M41 17h1M49 17h1M53 17h1M57 17h3M63 17h7M73 17h1M79 17h1M87 17h7M97 17h7M107 17h7M9 18h1M13 18h1M17 18h1M21 18h1M27 18h1M31 18h1M35 18h5M49 18h1M53 18h1M59 18h1M63 18h1M73 18h1M79 18h1M87 18h1M97 18h1M103 18h1M107 18h1M9 19h1M13 19h1M17 19h1M21 19h1M27 19h1M31 19h1M35 19h5M49 19h1M53 19h1M59 19h1M63 19h1M73 19h1M79 19h1M87 19h1M97 19h1M103 19h1M107 19h1M11 20h1M15 20h1M21 20h7M31 20h1M35 20h1M41 20h1M49 20h1M53 20h1M59 20h1M63 20h7M75 20h3M87 20h7M97 20h1M103 20h1M107 20h7M11 21h1M15 21h1M21 21h7M31 21h1M35 21h1M41 21h1M49 21h1M53 21h1M59 21h1M63 21h7M75 21h3M87 21h7M97 21h1M103 21h1M107 21h7M9 24h7M19 24h7M29 24h1M37 24h1M41 24h7M51 24h7M65 24h1M77 24h3M85 24h1M89 24h7M99 24h7M113 24h1M125 24h3M9 25h7M19 25h7M29 25h1M37 25h1M41 25h7M51 25h7M65 25h1M77 25h3M85 25h1M89 25h7M99 25h7M113 25h1M125 25h3M9 26h1M19 26h1M25 26h1M29 26h1M37 26h1M41 26h1M47 26h1M51 26h1M65 26h1M75 26h1M81 26h1M85 26h1M89 26h1M95 26h1M99 26h1M113 26h1M123 26h1M129 26h1M9 27h1M19 27h1M25 27h1M29 27h1M37 27h1M41 27h1M47 27h1M51 27h1M65 27h1M75 27h1M81 27h1M85 27h1M89 27h1M95 27h1M99 27h1M113 27h1M123 27h1M129 27h1M9 28h7M19 28h7M29 28h1M33 28h1M37 28h1M41 28h7M51 28h1M65 28h7M75 28h1M81 28h1M85 28h1M89 28h7M99 28h7M113 28h7M123 28h1M129 28h1M9 29h7M19 29h7M29 29h1M33 29h1M37 29h1M41 29h7M51 29h1M65 29h7M75 29h1M81 29h1M85 29h1M89 29h7M99 29h7M113 29h7M123 29h1M129 29h1M15 30h1M19 30h1M29 30h1M33 30h1M37 30h1M41 30h1M51 30h1M65 30h1M71 30h1M75 30h1M81 30h1M85 30h1M89 30h1M105 30h1M113 30h1M123 30h1M129 30h1M15 31h1M19 31h1M29 31h1M33 31h1M37 31h1M41 31h1M51 31h1M65 31h1M71 31h1M75 31h1M81 31h1M85 31h1M89 31h1M105 31h1M113 31h1M123 31h1M129 31h1M9 32h7M19 32h7M31 32h1M35 32h1M41 32h7M51 32h1M65 32h1M71 32h1M77 32h3M85 32h1M89 32h7M99 32h7M113 32h7M125 32h3M9 33h7M19 33h7M31 33h1M35 33h1M41 33h7M51 33h1M65 33h1M71 33h1M77 33h3M85 33h1M89 33h7M99 33h7M113 33h7M125 33h3M9 36h7M19 36h1M23 36h5M33 36h1M39 36h1M47 36h1M57 36h1M67 36h7M81 36h7M91 36h5M101 36h1M109 36h1M113 36h7M123 36h7M9 37h7M19 37h1M23 37h5M33 37h1M39 37h1M47 37h1M57 37h1M67 37h7M81 37h7M91 37h5M101 37h1M109 37h1M113 37h7M123 37h7M9 38h1M15 38h1M19 38h1M29 38h1M33 38h1M39 38h1M47 38h1M57 38h1M67 38h1M73 38h1M81 38h1M97 38h1M101 38h3M107 38h3M113 38h1M119 38h1M123 38h1M9 39h1M15 39h1M19 39h1M29 39h1M33 39h1M39 39h1M47 39h1M57 39h1M67 39h1M73 39h1M81 39h1M97 39h1M101 39h3M107 39h3M113 39h1M119 39h1M123 39h1M9 40h7M19 40h1M23 40h7M33 40h7M47 40h7M57 40h7M67 40h7M81 40h1M85 40h3M91 40h7M101 40h1M105 40h1M109 40h1M113 40h7M123 40h7M9 41h7M19 41h1M23 41h7M33 41h7M47 41h7M57 41h7M67 41h7M81 41h1M85 41h3M91 41h7M101 41h1M105 41h1M109 41h1M113 41h7M123 41h7M9 42h1M19 42h1M23 42h1M29 42h1M39 42h1M47 42h1M57 42h1M63 42h1M67 42h1M81 42h1M87 42h1M91 42h1M97 42h1M101 42h1M105 42h1M109 42h1M113 42h1M129 42h1M9 43h1M19 43h1M23 43h1M29 43h1M39 43h1M47 43h1M57 43h1M63 43h1M67 43h1M81 43h1M87 43h1M91 43h1M97 43h1M101 43h1M105 43h1M109 43h1M113 43h1M129 43h1M9 44h1M19 44h1M23 44h7M33 44h7M47 44h7M57 44h1M63 44h1M67 44h7M81 44h7M91 44h7M101 44h1M105 44h1M109 44h1M113 44h7M123 44h7M133 44h1M9 45h1M19 45h1M23 45h7M33 45h7M47 45h7M57 45h1M63 45h1M67 45h7M81 45h7M91 45h7M101 45h1M105 45h1M109 45h1M113 45h7M123 45h7M133 45h1" />
+ <path stroke="#7171c3" d="M10 10h1M18 10h1M10 11h1M18 11h1M10 12h1M18 12h1M26 12h1M32 12h1M36 12h1M50 12h1M54 12h1M60 12h1M64 12h1M78 12h1M88 12h1M98 12h1M114 12h1M10 13h1M18 13h1M26 13h1M32 13h1M36 13h1M50 13h1M54 13h1M60 13h1M64 13h1M78 13h1M88 13h1M98 13h1M114 13h1M10 14h1M18 14h1M28 14h1M32 14h1M36 14h1M56 14h1M60 14h1M64 14h1M74 14h1M80 14h1M88 14h1M98 14h1M108 14h1M114 14h1M10 15h1M18 15h1M28 15h1M32 15h1M36 15h1M56 15h1M60 15h1M64 15h1M74 15h1M80 15h1M88 15h1M98 15h1M108 15h1M114 15h1M10 16h1M14 16h1M18 16h1M28 16h1M32 16h1M36 16h1M42 16h1M50 16h1M54 16h1M60 16h1M70 16h1M74 16h1M80 16h1M94 16h1M104 16h1M114 16h1M10 17h1M14 17h1M18 17h1M28 17h1M32 17h1M36 17h1M42 17h1M50 17h1M54 17h1M60 17h1M70 17h1M74 17h1M80 17h1M94 17h1M104 17h1M114 17h1M10 18h1M14 18h1M18 18h1M22 18h1M28 18h1M32 18h1M40 18h1M50 18h1M54 18h1M60 18h1M64 18h1M74 18h1M80 18h1M88 18h1M98 18h1M104 18h1M108 18h1M10 19h1M14 19h1M18 19h1M22 19h1M28 19h1M32 19h1M40 19h1M50 19h1M54 19h1M60 19h1M64 19h1M74 19h1M80 19h1M88 19h1M98 19h1M104 19h1M108 19h1M12 20h1M16 20h1M28 20h1M32 20h1M36 20h1M42 20h1M50 20h1M54 20h1M60 20h1M70 20h1M78 20h1M94 20h1M98 20h1M104 20h1M114 20h1M12 21h1M16 21h1M28 21h1M32 21h1M36 21h1M42 21h1M50 21h1M54 21h1M60 21h1M70 21h1M78 21h1M94 21h1M98 21h1M104 21h1M114 21h1M16 24h1M26 24h1M30 24h1M38 24h1M48 24h1M58 24h1M66 24h1M80 24h1M86 24h1M96 24h1M106 24h1M114 24h1M128 24h1M16 25h1M26 25h1M30 25h1M38 25h1M48 25h1M58 25h1M66 25h1M80 25h1M86 25h1M96 25h1M106 25h1M114 25h1M128 25h1M10 26h1M20 26h1M26 26h1M30 26h1M38 26h1M42 26h1M48 26h1M52 26h1M66 26h1M76 26h1M82 26h1M86 26h1M90 26h1M96 26h1M100 26h1M114 26h1M124 26h1M130 26h1M10 27h1M20 27h1M26 27h1M30 27h1M38 27h1M42 27h1M48 27h1M52 27h1M66 27h1M76 27h1M82 27h1M86 27h1M90 27h1M96 27h1M100 27h1M114 27h1M124 27h1M130 27h1M16 28h1M26 28h1M30 28h1M34 28h1M38 28h1M48 28h1M52 28h1M72 28h1M76 28h1M82 28h1M86 28h1M96 28h1M106 28h1M120 28h1M124 28h1M130 28h1M16 29h1M26 29h1M30 29h1M34 29h1M38 29h1M48 29h1M52 29h1M72 29h1M76 29h1M82 29h1M86 29h1M96 29h1M106 29h1M120 29h1M124 29h1M130 29h1M16 30h1M20 30h1M30 30h1M34 30h1M38 30h1M42 30h1M52 30h1M66 30h1M72 30h1M76 30h1M82 30h1M86 30h1M90 30h1M106 30h1M114 30h1M124 30h1M130 30h1M16 31h1M20 31h1M30 31h1M34 31h1M38 31h1M42 31h1M52 31h1M66 31h1M72 31h1M76 31h1M82 31h1M86 31h1M90 31h1M106 31h1M114 31h1M124 31h1M130 31h1M16 32h1M26 32h1M32 32h1M36 32h1M48 32h1M52 32h1M66 32h1M72 32h1M80 32h1M86 32h1M96 32h1M106 32h1M120 32h1M128 32h1M16 33h1M26 33h1M32 33h1M36 33h1M48 33h1M52 33h1M66 33h1M72 33h1M80 33h1M86 33h1M96 33h1M106 33h1M120 33h1M128 33h1M16 36h1M20 36h1M28 36h1M34 36h1M40 36h1M48 36h1M58 36h1M74 36h1M88 36h1M96 36h1M102 36h1M110 36h1M120 36h1M130 36h1M16 37h1M20 37h1M28 37h1M34 37h1M40 37h1M48 37h1M58 37h1M74 37h1M88 37h1M96 37h1M102 37h1M110 37h1M120 37h1M130 37h1M10 38h1M16 38h1M20 38h1M30 38h1M34 38h1M40 38h1M48 38h1M58 38h1M68 38h1M74 38h1M82 38h1M98 38h1M104 38h1M110 38h1M114 38h1M120 38h1M124 38h1M10 39h1M16 39h1M20 39h1M30 39h1M34 39h1M40 39h1M48 39h1M58 39h1M68 39h1M74 39h1M82 39h1M98 39h1M104 39h1M110 39h1M114 39h1M120 39h1M124 39h1M16 40h1M20 40h1M30 40h1M40 40h1M54 40h1M64 40h1M74 40h1M82 40h1M88 40h1M98 40h1M102 40h1M106 40h1M110 40h1M120 40h1M130 40h1M16 41h1M20 41h1M30 41h1M40 41h1M54 41h1M64 41h1M74 41h1M82 41h1M88 41h1M98 41h1M102 41h1M106 41h1M110 41h1M120 41h1M130 41h1M10 42h1M20 42h1M24 42h1M30 42h1M40 42h1M48 42h1M58 42h1M64 42h1M68 42h1M82 42h1M88 42h1M92 42h1M98 42h1M102 42h1M106 42h1M110 42h1M114 42h1M130 42h1M10 43h1M20 43h1M24 43h1M30 43h1M40 43h1M48 43h1M58 43h1M64 43h1M68 43h1M82 43h1M88 43h1M92 43h1M98 43h1M102 43h1M106 43h1M110 43h1M114 43h1M130 43h1M10 44h1M20 44h1M30 44h1M40 44h1M54 44h1M58 44h1M64 44h1M74 44h1M88 44h1M98 44h1M102 44h1M106 44h1M110 44h1M120 44h1M130 44h1M134 44h1M10 45h1M20 45h1M30 45h1M40 45h1M54 45h1M58 45h1M64 45h1M74 45h1M88 45h1M98 45h1M102 45h1M106 45h1M110 45h1M120 45h1M130 45h1M134 45h1" />
+ <path stroke="#1f2a9c" d="M1 49h1M1 51h1" />
+ <path stroke="rgba(161,165,166,0.8941176470588236)" d="M0 50h1" />
+ <path stroke="#1f2a9d" d="M1 50h1" />
+ <path stroke="#3030bf" d="M3 53h1" />
+ <path stroke="rgba(158,164,162,0.9019607843137255)" d="M0 54h1" />
+ <path stroke="#1e2a9c" d="M1 54h1" />
+ <path stroke="#322cc9" d="M2 54h1" />
+ <path stroke="#312dc4" d="M3 54h140" />
+ <path stroke="#312dc5" d="M143 54h1" />
+ <path stroke="#2528ba" d="M144 54h1" />
+ <path stroke="rgba(161,174,200,0.8549019607843137)" d="M145 54h1" />
+ <path stroke="rgba(174,179,175,0.8431372549019608)" d="M0 55h1" />
+ <path stroke="#243b85" d="M1 55h1" />
+ <path stroke="#263fa8" d="M2 55h1" />
+ <path stroke="#2740a4" d="M3 55h140" />
+ <path stroke="#253ea4" d="M143 55h1" />
+ <path stroke="#2e48a8" d="M144 55h1" />
+ <path stroke="rgba(170,180,193,0.7686274509803922)" d="M145 55h1" />
+ <path stroke="rgba(213,215,215,0.5294117647058824)" d="M0 56h1" />
+ <path stroke="rgba(205,211,211,0.9450980392156862)" d="M1 56h1" />
+ <path stroke="rgba(204,215,217,0.9529411764705882)" d="M2 56h1" />
+ <path stroke="rgba(205,215,217,0.9529411764705882)" d="M3 56h75M82 56h4" />
+ <path stroke="rgba(205,216,217,0.9490196078431372)" d="M78 56h4" />
+ <path stroke="rgba(205,215,217,0.9568627450980393)" d="M86 56h1M88 56h5M94 56h29M124 56h9M134 56h9" />
+ <path stroke="rgba(205,215,217,0.9607843137254902)" d="M87 56h1M93 56h1M123 56h1M133 56h1M143 56h1" />
+ <path stroke="rgba(208,217,218,0.9607843137254902)" d="M144 56h1" />
+ <path stroke="rgba(158,164,164,0.35294117647058826)" d="M145 56h1" />
+ <path stroke="rgba(199,199,199,0.1450980392156863)" d="M0 57h1" />
+ <path stroke="rgba(193,193,193,0.19607843137254902)" d="M1 57h1" />
+ <path stroke="rgba(206,206,202,0.20784313725490197)" d="M2 57h1" />
+ <path stroke="rgba(206,202,202,0.20784313725490197)" d="M3 57h41M45 57h6M52 57h2M55 57h2M58 57h4M64 57h2M67 57h1M70 57h4M75 57h3M84 57h2" />
+ <path stroke="rgba(205,205,201,0.20392156862745098)" d="M44 57h1M51 57h1M54 57h1M57 57h1M62 57h2M66 57h1M68 57h2M74 57h1M78 57h2M81 57h3" />
+ <path stroke="rgba(205,205,205,0.2)" d="M80 57h1" />
+ <path stroke="rgba(207,203,203,0.21176470588235294)" d="M86 57h1M88 57h5M94 57h29M124 57h9M134 57h9" />
+ <path stroke="rgba(204,204,204,0.21568627450980393)" d="M87 57h1M93 57h1M123 57h1M133 57h1" />
+ <path stroke="rgba(208,204,204,0.21568627450980393)" d="M143 57h1" />
+ <path stroke="rgba(194,194,194,0.21568627450980393)" d="M144 57h1" />
+ <path stroke="rgba(180,180,180,0.06666666666666667)" d="M145 57h1" />
+ </svg>
+       
+       
+    </div>
+ </div>
 <Body>
-    <h1>JavaScript Practice</h1>
-    <script src="main.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+
+    var character = document.querySelector(".character");
+    var map = document.querySelector(".map");
+
+    //start in the middle of the map
+    var x = 90;
+    var y = 64;
+    var held_directions = []; //State of which arrow keys we are holding down
+    var speed = 1; //How fast the character moves in pixels per frame
+
+    const placeCharacter = () => {
+    
+    var pixelSize = parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue('--pixel-size')
+    );
+    
+    const held_direction = held_directions[0];
+    if (held_direction) {
+        if (held_direction === directions.right) {x += speed;}
+        if (held_direction === directions.left) {x -= speed;}
+        if (held_direction === directions.down) {y += speed;}
+        if (held_direction === directions.up) {y -= speed;}
+        character.setAttribute("facing", held_direction);
+    }
+    character.setAttribute("walking", held_direction ? "true" : "false");
+    
+    //Limits (gives the illusion of walls)
+    var leftLimit = -5;
+    var rightLimit = (16 * 11)+300;
+    var topLimit = (-8 + 32)+34;
+    var bottomLimit = (16 * 7)+20;
+    if (x < leftLimit) { x = leftLimit; }
+    if (x > rightLimit) { x = rightLimit; }
+    if (y < topLimit) { y = topLimit; }
+    if (y > bottomLimit) { y = bottomLimit; }
+    console.log("x " + x);
+    console.log("y" + y);
+    
+    var camera_left = pixelSize * 66;
+    var camera_top = pixelSize * 42;
+    
+    map.style.transform = `translate3d( ${-x*pixelSize+camera_left}px, ${-y*pixelSize+camera_top}px, 0 )`;
+    character.style.transform = `translate3d( ${x*pixelSize}px, ${y*pixelSize}px, 0 )`;  
+    }
+   
+    //Set up the game loop
+    const step = () => {
+    placeCharacter();
+    window.requestAnimationFrame(() => {
+            maamholes();
+        step();
+    })
+    }
+    step(); //kick off the first step!
+
+    function maamholes() {
+      //breakout
+      if (x >= 19 && y >= 74 && x <= 38 && y <= 80){
+         let spritesheet = document.getElementsByClassName('character_spritesheet');
+
+         window.location.href = "/breakout.html";
+      }
+    }
+
+
+    /* Direction key state */
+    const directions = {
+    up: "up",
+    down: "down",
+    left: "left",
+    right: "right",
+    }
+    const keys = {
+    38: directions.up,
+    37: directions.left,
+    39: directions.right,
+    40: directions.down,
+    87: directions.up,
+    65: directions.left,
+    83: directions.down,
+    68: directions.right,
+    }
+    document.addEventListener("keydown", (e) => {
+    var dir = keys[e.which];
+    if (dir && held_directions.indexOf(dir) === -1) {
+        held_directions.unshift(dir)
+    }
+    })
+
+    document.addEventListener("keyup", (e) => {
+    var dir = keys[e.which];
+    var index = held_directions.indexOf(dir);
+    if (index > -1) {
+        held_directions.splice(index, 1)
+    }
+    });
+
+
+
+    /* BONUS! Dpad functionality for mouse and touch */
+    var isPressed = false;
+    const removePressedAll = () => {
+    document.querySelectorAll(".dpad-button").forEach(d => {
+        d.classList.remove("pressed")
+    })
+    }
+    document.body.addEventListener("mousedown", () => {
+    console.log('mouse is down')
+    isPressed = true;
+    })
+    document.body.addEventListener("mouseup", () => {
+    console.log('mouse is up')
+    isPressed = false;
+    held_directions = [];
+    removePressedAll();
+    })
+    const handleDpadPress = (direction, click) => {   
+    if (click) {
+        isPressed = true;
+    }
+    held_directions = (isPressed) ? [direction] : []
+    
+    if (isPressed) {
+        removePressedAll();
+        document.querySelector(".dpad-"+direction).classList.add("pressed");
+    }
+    }
+    //Bind a ton of events for the dpad
+    document.querySelector(".dpad-left").addEventListener("touchstart", (e) => handleDpadPress(directions.left, true));
+    document.querySelector(".dpad-up").addEventListener("touchstart", (e) => handleDpadPress(directions.up, true));
+    document.querySelector(".dpad-right").addEventListener("touchstart", (e) => handleDpadPress(directions.right, true));
+    document.querySelector(".dpad-down").addEventListener("touchstart", (e) => handleDpadPress(directions.down, true));
+
+    document.querySelector(".dpad-left").addEventListener("mousedown", (e) => handleDpadPress(directions.left, true));
+    document.querySelector(".dpad-up").addEventListener("mousedown", (e) => handleDpadPress(directions.up, true));
+    document.querySelector(".dpad-right").addEventListener("mousedown", (e) => handleDpadPress(directions.right, true));
+    document.querySelector(".dpad-down").addEventListener("mousedown", (e) => handleDpadPress(directions.down, true));
+
+    document.querySelector(".dpad-left").addEventListener("mouseover", (e) => handleDpadPress(directions.left));
+    document.querySelector(".dpad-up").addEventListener("mouseover", (e) => handleDpadPress(directions.up));
+    document.querySelector(".dpad-right").addEventListener("mouseover", (e) => handleDpadPress(directions.right));
+    document.querySelector(".dpad-down").addEventListener("mouseover", (e) => handleDpadPress(directions.down));
+
+
+
+
+
+
+
+
+
+    </script>
+    
 </Body>
+
+</div>
+
+
+
 </html>

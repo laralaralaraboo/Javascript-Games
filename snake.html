@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+    <style>
+        body {
+            background-image:  url('');
+            background-repeat: no-repeat;
+            color:azure;
+        }
+    </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/jpg" href="https://kbsalazar.files.wordpress.com/2012/07/galagagraph-1_tn.jpg">
+    <title>Snake!</title>
+
+</head>
+<body>
+    <canvas id="canvas" width="300" height="300" style="border: 2px dotted black"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas')
+        const ctx = canvas.getContext('2d')
+        let snakeH = snakeW = 10
+        let canvasH = canvas.height
+        let canvasW = canvas.width
+        let rightPressed = leftPressed = upPressed = downPressed = false
+        let snakes = [
+
+            {x: 10, y: 10,},
+        ]
+        drawSnake()
+        moveSnake()
+        snakeNavigation()
+
+        function snakeNavigation() {
+            document.addEventListener('keydown', handleKeyDown)
+            document.addEventListener('keyup', handleKeyUp)
+
+            function handleKeyDown(e) {
+                if(e.key === 'ArrowDown'){
+                    downPressed = true
+                }
+                if(e.key === 'ArrowUp'){
+                    upPressed = true
+                }
+                if(e.key === 'ArrowLeft'){
+                    leftPressed = true
+                }
+                if(e.key === 'ArrowRight'){
+                    rightPressed = true
+                }
+            }
+// 9.39.58 https://www.youtube.com/watch?v=RzK94EC28bw&feature=youtu.be
+            function handleKeyUp(e) {
+                if(e.key === 'ArrowDown'){
+                    downPressed = false
+                }
+                if(e.key === 'ArrowUp'){
+                    upPressed = false
+                }
+                if(e.key === 'ArrowLeft'){
+                    leftPressed = false
+                }
+                if(e.key === 'ArrowRight'){
+                    rightPressed = false
+                }
+            }
+        }
+
+        function moveSnake() {
+           setInterval(() => {
+               snakes.forEach(snake => snake.x += 10)
+               ctx.clearRect(0,0,canvasW, canvasH)
+               drawSnake()
+           },180);//snake speed
+        }
+
+        //draw snake rectangles
+        function drawSnake() {
+            snakes.forEach(snake => {
+            ctx.beginPath()
+            ctx.rect(snake.x, snake.y, snakeW, snakeH)
+            ctx.fillStyle= "black"
+            ctx.fill()
+            ctx.closePath()
+            })
+        }
+
+    </script>
+
+
+
+</body>
+</html>
