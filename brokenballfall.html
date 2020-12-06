@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ball Fall</title>
+    </head>
+    <body>
+        <canvas id="canvas" height="300" style="border:3.5px dotted #ffa45b;border-bottom: 3.5px dotted rgba(165, 42, 42, 0.356) center">Canvas is not supported.</canvas>
+    <script>
+        const canvas = document.getElementById('canvas')
+        const ctx = canvas.getContext('2d')
+        const canvasH = canvas.height
+        const canvasW = canvas.width
+
+        // variables
+
+        let ballradius = 10
+        let ballx = 150
+        let bally = 150
+        let floory = 25
+        rightPressed = leftPressed = false
+        drawball()
+        drawfloor()
+        animation()
+        ballNavigation()
+        collisionDetection()
+
+        // functions
+
+
+        function collisionDetection (){
+            console.log(bally, floory)
+            function leftWall(){
+                if (ballx <=5){
+                    ballx = -ballx
+                }
+            }
+            function rightWall(){
+                if (ballx >= canvasW){
+                    ballx = -ballx  //the heck
+                }
+            }
+            function floor(){  // broke boroke borkwrjioerj
+                if(bally = Math.abs(floory)-20){
+                    bally = -bally
+
+
+                }
+            }
+            leftWall()
+            rightWall()
+            floor()
+        }
+
+        function ballNavigation(){
+            document.addEventListener('keydown', handleKeyDown)
+            document.addEventListener('keyup', handleKeyUp)
+
+        function handleKeyDown(e) {
+            if(e.key === "ArrowRight"){
+                rightPressed = true
+            }
+            if(e.key === "ArrowLeft"){
+                leftPressed = true
+            }
+        }
+
+        function handleKeyUp(e) {
+            if(e.key === "ArrowRight"){
+                rightPressed = false
+             }
+            if(e.key === "ArrowLeft"){
+                leftPressed = false
+                }
+            }
+        }
+
+        function drawball() {
+            ctx.beginPath();
+            ctx.arc(ballx+5, bally, ballradius+2, 0, 2* Math.PI);
+            ctx.fillStyle = "white";
+            ctx.fill();
+            ctx.closePath();
+
+            ctx.beginPath();
+            ctx.arc(ballx-5, bally, ballradius+2, 0, 2* Math.PI);
+            ctx.fillStyle = "white";
+            ctx.fill();
+            ctx.closePath();
+
+            ctx.beginPath();
+            ctx.arc(ballx, bally, ballradius, 0, 2* Math.PI);
+            ctx.fillStyle = "black";
+            ctx.fill();
+            ctx.stroke();
+            ctx.closePath();
+
+        }
+
+        function drawfloor() {
+            ctx.beginPath();
+            ctx.clearRect(0, canvasH - floory, canvasW, 20);
+            ctx.rect(0, canvasH - floory, canvasW, 10);
+            ctx.fillStyle = "black";
+            ctx.fill();
+            ctx.stroke();
+            ctx.closePath();
+
+        }
+                //the magic is happening here
+        function animation() {
+            drawfloor()
+            drawball()
+            ballNavigation()
+            collisionDetection()
+            floory += .325
+            bally += .325
+            if(rightPressed){
+                        ballx = ballx + 5
+                    }
+
+            if(leftPressed){
+                        ballx = ballx - 5
+                    }
+            window.requestAnimationFrame(animation);
+        }
+
+
+
+    </script>
+    </body>
+</html>

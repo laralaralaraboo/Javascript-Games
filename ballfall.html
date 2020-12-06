@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ball Fall</title>
+    </head>
+    <body>
+        <canvas id="canvas" height="300" style="border:3.5px dotted #ffa45b;border-bottom: 3.5px dotted rgba(165, 42, 42, 0.356) center">Canvas is not supported.</canvas>
+    <script>
+        const canvas = document.getElementById('canvas')
+        const ctx = canvas.getContext('2d')
+        const canvasH = canvas.height
+        const canvasW = canvas.width
+
+        let ball = {x:150, y:-10, r:5};
+        let platformH = 10;
+        let platformW = canvasW;
+        let platformDiff = 50;
+        let platformspeed = 1 //speed (whole numbers only)
+        let leftPressed = rightPressed = false
+        function randHoleX(){
+            return Math.floor((Math.random()* 270))
+        };
+        
+
+        let platforms = [
+            {x:0, y: canvasH, holeX: randHoleX(), holeW: 20 }
+            
+         ];
+        drawPlatforms();
+        drawBall();
+        movePlatforms();
+        navigateBall();
+
+        function navigateBall() {
+            document.addEventListener('keydown', (e) => {
+                if(e.key === 'ArrowLeft'){
+                    leftPressed = true
+                }
+
+                if(e.key === 'ArrowRight'){
+                    rightPressed = true
+                }
+            })
+            document.addEventListener('keyup', (e) => {
+                if(e.key === 'ArrowLeft'){
+                    leftPressed = false
+                }
+                if(e.key === 'ArrowRight'){
+                    rightPressed = false
+                }
+
+            })
+        }
+
+
+        function movePlatforms() {
+                let count = 0;
+            setInterval(() => {
+                if(count === Math.floor(platformDiff / platformspeed)){
+                    if(platforms.length > 10 ){
+                        platforms.splice(0,2)
+                    }
+                const lastPlatform = platforms[platforms.length - 1];
+                platforms.push(
+                    {x:0, y: lastPlatform.y + platformDiff, holeX: randHoleX(), holeW: 20 }
+                )
+                
+                count = 0;
+                }
+                platforms.forEach((pl) => {
+                    pl.y = pl.y - platformspeed; //platform movement speed
+                });
+                ctx.clearRect(0,0,canvasW, canvasH)
+                drawPlatforms();
+                drawBall();
+                console.log(leftPressed, rightPressed, ball.x)
+                count++
+            }, 20);
+        }
+            
+        function drawBall(){
+            const firstPl = platforms[0];
+            if (ball.y > firstPl.y - ball.r){
+                ball.y = firstPl.y - ball.r;
+            } else {
+                ball.y+=5;
+            }
+
+            //navigation
+            if (leftPressed && ball.x >0){
+                ball.x -= 5;
+            }
+            if (rightPressed && ball.x < canvasW){
+                ball.x += 5;
+            }
+
+
+
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI);
+            ctx.fillStyle = "#fecd1a";
+            ctx.fill();
+            ctx.closePath();
+        }
+        function drawPlatforms(){
+                platforms.forEach((pl) => {
+                    createPl(pl);
+                    createHole(pl);
+                });
+
+            function createHole(pl) {
+            ctx.beginPath();
+            ctx.rect(pl.holeX, pl.y, pl.holeW, platformH);
+            ctx.fillStyle = "white";
+            ctx.fill();
+            ctx.closePath();    
+            }
+            function createPl(pl) {
+            ctx.beginPath();
+            ctx.rect(pl.x, pl.y, platformW, platformH);
+            ctx.fillStyle = "#fd3a69";
+            ctx.fill();
+            ctx.closePath();
+            }
+        }
+
+
+
+    </script>
+
+</body>
+</html>

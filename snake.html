@@ -20,12 +20,16 @@
     <script>
         const canvas = document.getElementById('canvas')
         const ctx = canvas.getContext('2d')
-        let snakeH = snakeW = 10
+        let snakeH = snakeW = 5
         let canvasH = canvas.height
         let canvasW = canvas.width
         let rightPressed = leftPressed = upPressed = downPressed = false
+        let direction = 'x'
         let snakes = [
 
+           {x: 25, y: 10,},
+           {x: 20, y: 10,},
+           {x: 15, y: 10,},
             {x: 10, y: 10,},
         ]
         drawSnake()
@@ -50,7 +54,6 @@
                     rightPressed = true
                 }
             }
-// 9.39.58 https://www.youtube.com/watch?v=RzK94EC28bw&feature=youtu.be
             function handleKeyUp(e) {
                 if(e.key === 'ArrowDown'){
                     downPressed = false
@@ -69,10 +72,12 @@
 
         function moveSnake() {
            setInterval(() => {
-               snakes.forEach(snake => snake.x += 10)
+                const head = {x : snakes[0].x = 10, y: snakes[0].y}
+                snakes.unshift(head)
+                //snake.pop()
                ctx.clearRect(0,0,canvasW, canvasH)
                drawSnake()
-           },180);//snake speed
+           },20);//snake speed
         }
 
         //draw snake rectangles
