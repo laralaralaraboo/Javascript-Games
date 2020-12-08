@@ -1,5 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+    <style>
+        body {
+            background-image:  url('https://hdwallpaperim.com/wp-content/uploads/2017/08/104598-space-pixel_art-horizon-stars.jpg');
+            background-repeat: no-repeat;
+            color:azure;
+        }
+    </style>
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,12 +20,15 @@
         const canvasH = canvas.height
         const canvasW = canvas.width
 
-        let ball = {x:150, y:-10, r:5};
+        let ball = {x:150, y:-8, r:5};
         let platformH = 10;
         let platformW = canvasW;
         let platformDiff = 50;
         let platformspeed = 1 //speed (whole numbers only)
         let leftPressed = rightPressed = false
+        let moveSpeed = 2;
+        let lives = 5;
+        let score = 0;
         function randHoleX(){
             return Math.floor((Math.random()* 270))
         };
@@ -32,9 +42,36 @@
         drawBall();
         movePlatforms();
         navigateBall();
+        drawScore();
+
+        function drawScore(){
+            ctx.beginPath()
+            ctx.fillStyle = "#f6f5f1"
+            ctx.fill()
+            ctx.fillText("Score: " + score, 10 ,10)
+            ctx.closePath()
+
+            ctx.beginPath()
+            ctx.fillStyle = "#f6f5f1"
+            ctx.fill()
+            ctx.fillText("Lives: " + lives, 245 ,10)
+            ctx.closePath()
+
+        }
 
         function navigateBall() {
             document.addEventListener('keydown', (e) => {
+                if(e.getModifierState("Alt")){
+                    
+                    if(e.key === 'ArrowLeft'){
+                    moveSpeed = 10;
+                }
+
+                if(e.key === 'ArrowRight'){
+                    moveSpeed = 10;
+                }
+                }
+                
                 if(e.key === 'ArrowLeft'){
                     leftPressed = true
                 }
@@ -62,40 +99,71 @@
                     if(platforms.length > 10 ){
                         platforms.splice(0,2)
                     }
-                const lastPlatform = platforms[platforms.length - 1];
-                platforms.push(
-                    {x:0, y: lastPlatform.y + platformDiff, holeX: randHoleX(), holeW: 20 }
-                )
-                
+                addNewPlatform();
+                console.log(ball.y, lives)
                 count = 0;
                 }
                 platforms.forEach((pl) => {
                     pl.y = pl.y - platformspeed; //platform movement speed
                 });
+
+                const closest = platforms.find(
+                (pl) => ball.y < pl.y +10 && ball.y > pl.y - ball.r);
+
+                if(closest){
+                holeAndDrop(closest);
+                }else{
+                    ball.y += 5;
+                }
+
                 ctx.clearRect(0,0,canvasW, canvasH)
                 drawPlatforms();
                 drawBall();
-                console.log(leftPressed, rightPressed, ball.x)
+                drawScore();
                 count++
             }, 20);
         }
+        function addNewPlatform(){
+            const lastPlatform = platforms[platforms.length - 1];
+                platforms.push(
+                    {x:0, y: lastPlatform.y + platformDiff, holeX: randHoleX(), holeW: 20 }
+                )
+        }
             
+        function holeAndDrop (closest){
+  
+            if (ball.y > closest.y - ball.r){
+                if (ball.x > closest.holeX && ball.x < closest.holeX + closest.holeW){
+                ball.y += 1;
+                score += 5;
+                }else{
+                ball.y = closest.y - ball.r;
+                }
+            } 
+        }
+
+      
         function drawBall(){
-            const firstPl = platforms[0];
-            if (ball.y > firstPl.y - ball.r){
-                ball.y = firstPl.y - ball.r;
-            } else {
-                ball.y+=5;
-            }
+
 
             //navigation
             if (leftPressed && ball.x >0){
-                ball.x -= 5;
+                ball.x -= 2;
             }
             if (rightPressed && ball.x < canvasW){
-                ball.x += 5;
+                ball.x += 2;
+            }
+            
+            if (ball.y >= canvasH){
+                ball.y -= 5;
             }
 
+            if (ball.y <= -10){
+                if (lives === 0){
+                    Gameover();
+                }else
+                Dead();
+            }
 
 
             ctx.beginPath();
@@ -113,7 +181,7 @@
             function createHole(pl) {
             ctx.beginPath();
             ctx.rect(pl.holeX, pl.y, pl.holeW, platformH);
-            ctx.fillStyle = "white";
+            ctx.fillStyle = "black";
             ctx.fill();
             ctx.closePath();    
             }
@@ -125,6 +193,48 @@
             ctx.closePath();
             }
         }
+
+
+        function Dead(){
+            window.alert("Sorry Bub! You're mashed.");
+            lives -= 1;
+            ball.y = -8
+            platforms.splice(0)
+
+
+
+           // function randHoleX(){
+            //return Math.floor((Math.random()* 270))
+       // };
+           platforms = [
+            {x:0, y: canvasH, holeX: randHoleX(), holeW: 20 }
+            ];
+            platformspeed = 1;
+            leftPressed = rightPressed = false;
+            drawPlatforms();
+            movePlatforms();
+        }
+        function Gameover(){
+            window.alert("It's curtains for you kid. No more mans.");
+            lives = 5;
+            score = 0
+            ball.y = -8
+            platforms.splice(0)
+
+
+
+           // function randHoleX(){
+            //return Math.floor((Math.random()* 270))
+       // };
+           platforms = [
+            {x:0, y: canvasH, holeX: randHoleX(), holeW: 20 }
+            ];
+            platformspeed = 1;
+            leftPressed = rightPressed = false;
+            drawPlatforms();
+            movePlatforms();
+        }
+
 
 
 

@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "Javascript-Games",
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Javascript-Games"
+	}
+}
